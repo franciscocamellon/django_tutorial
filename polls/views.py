@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import F
 from django.urls import reverse
 
 from .models import Choice, Question
@@ -33,7 +34,8 @@ def vote(request, question_id):
             'error_message': "You didn't select a choice",
         })
     else:
-        selected_choice.votes += 1
+        # using F() to avoid race condition
+        selected_choice.votes = F('votes') + 1
         selected_choice.save()
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
